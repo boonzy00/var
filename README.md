@@ -95,7 +95,7 @@ Use VAR any time you:
 
 ```zig
 const router = var.VAR.init(.{
-    .gpu_threshold = 0.005,     // More aggressive GPU usage
+    .gpu_threshold = 0.01,     // More aggressive GPU usage
     .cpu_cores = 16,            // Adjusts threshold slightly
     .gpu_available = true,      // Set false on CPU-only systems
 });
@@ -113,11 +113,9 @@ if (selectivity < threshold) {
 }
 ```
 
-- **Threshold:** 0.005 (0.5%) by default
-- **Why 0.005?** Reasonable default based on typical GPU/CPU performance characteristics. Balances parallelism (GPU wins below 0.5%) vs. memory bandwidth (CPU wins above).
-- Adjusted for CPU core count (more cores → slightly higher threshold, less GPU usage)
 - **Threshold:** 0.01 (1%) by default
-- **Why 0.01?** A sensible default that balances GPU parallelism vs CPU memory bandwidth on common hardware.
+- **Why 0.01?** Reasonable default based on typical GPU/CPU performance characteristics. Balances parallelism (GPU wins below 1%) vs. memory bandwidth (CPU wins above).
+- Adjusted for CPU core count (more cores → lower threshold, more GPU usage)
 - **Configurable:** Use `Config.gpu_threshold` to override the default.
 - **CPU core scaling:** VAR scales the effective threshold by CPU cores so more CPU cores reduce the threshold (making GPU usage less likely). For example, with the default 8 cores, the configured threshold is used unchanged; 16 cores halve the effective threshold.
 
@@ -141,14 +139,12 @@ cd bench
 
 This generates `bench-results.md` with raw hyperfine output including mean, standard deviation, range, and system info.
 
-**Latest results (AMD Ryzen 7 5700, Zig 0.15.1):**
-- Workload: 1M queries (20% narrow, 80% broad)
-- Mean time: ~50ms for 1M decisions
-- Throughput: ~20M decisions/sec
-- Avg latency: ~50ns per decision
-- Note: Narrow queries leverage GPU acceleration; broad queries are CPU-bound
-- Full report: `bench/bench-results.md` 
-- Memory overhead: <1KB per router instance
+**Latest results (AMD Ryzen 7 5700, Zig 0.15.1, ReleaseFast):**
+- Workload: 1M queries with variable volumes
+- Mean time: ~0.2 ms for 1M decisions
+- Throughput: ~5B decisions/sec
+- Avg latency: ~0.2 ns per decision
+- Full report: `bench/bench-results.md`
 
 Full benchmark report: [bench-results.md](bench/bench-results.md)
 
@@ -160,8 +156,12 @@ zig build test
 
 For performance benchmarks:
 ```bash
-cd bench && ./run_bench.sh
+zig build benchmark  # Builds the benchmark binary
+./bench/run_bench.sh  # Runs hyperfine on the binary
 ```
+
+Full report: [bench/bench-results.md](bench/bench-results.md)  
+Source: [benchmarks/var_benchmark.zig](benchmarks/var_benchmark.zig)
 
 ## Limitations
 
