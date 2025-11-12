@@ -32,8 +32,18 @@ pub const VAR = struct {
         }
 
         const selectivity = query_volume / world_volume;
-        var threshold: f32 = 0.005;
-        if (self.config.cpu_cores >= 8) threshold = 0.01;
+
+        // Use the configured gpu_threshold as the base.
+        // Adjust for CPU core count: more CPU cores → relatively stronger CPU throughput,
+        // so reduce the threshold (less GPU usage) as cpu_cores increases.
+        var threshold: f32 = self.config.gpu_threshold;
+        // Avoid division by zero and clamp reasonable values.
+        const cores = if (self.config.cpu_cores == 0) 1 else self.config.cpu_cores;
+        const cores_f = @as(f32, @floatFromInt(cores));
+        // Scale: base * (8 / cores). For 8 cores this is 1.0 (no change). More cores -> smaller threshold.
+        threshold *= (8.0 / cores_f);
+        if (threshold <= 0.0) threshold = 0.000_001; // avoid degenerate zero or negative
+        if (threshold > 1.0) threshold = 1.0;
 
         return if (selectivity < threshold) .gpu else .cpu;
     }

@@ -116,6 +116,10 @@ if (selectivity < threshold) {
 - **Threshold:** 0.005 (0.5%) by default
 - **Why 0.005?** Reasonable default based on typical GPU/CPU performance characteristics. Balances parallelism (GPU wins below 0.5%) vs. memory bandwidth (CPU wins above).
 - Adjusted for CPU core count (more cores → slightly higher threshold, less GPU usage)
+- **Threshold:** 0.01 (1%) by default
+- **Why 0.01?** A sensible default that balances GPU parallelism vs CPU memory bandwidth on common hardware.
+- **Configurable:** Use `Config.gpu_threshold` to override the default.
+- **CPU core scaling:** VAR scales the effective threshold by CPU cores so more CPU cores reduce the threshold (making GPU usage less likely). For example, with the default 8 cores, the configured threshold is used unchanged; 16 cores halve the effective threshold.
 
 ## Safety & Edge Cases
 
