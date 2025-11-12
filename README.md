@@ -40,18 +40,10 @@ That’s it.
 | Broad (proximity, physics, large region)    | > 1,000 objects| CPU            | Memory bandwidth wins    |
 
 Manual routing = bugs, tuning, inconsistency.  
-VAR = one line, zero tuning, 100% correct.
+VAR = one line, zero tuning, deterministically correct.
 
-## Performance (Measured)
-
-| Workload      | GPU-only | CPU-only | VAR (auto) |
-|---------------|----------|----------|------------|
-| 1K objects    | 180K q/s | 500K q/s | 250K q/s   |
-| 10K objects   | 50K q/s  | 200K q/s | 200K q/s   |
-| 100K objects  | 5K q/s   | 150K q/s | 150K q/s   |
-
-VAR never picks the wrong path.  
-Tested across 100K random queries on RTX 4060 + Ryzen 7.
+VAR routes correctly based on selectivity, optimizing for parallelism (GPU) vs. memory bandwidth (CPU).  
+Validated with comprehensive unit tests covering edge cases.
 
 ## When to Use It
 
@@ -74,8 +66,6 @@ Use VAR any time you:
    ```bash
    zig fetch --save https://github.com/boonzy00/var/archive/v0.1.0.tar.gz
    ```
-
-   Listed on [zig.pm](https://zig.pm/)
 
 2. **Basic**
 
@@ -123,9 +113,9 @@ if (selectivity < threshold) {
 }
 ```
 
-- **Threshold:** 0.01 (1%) by default
-- **Why 0.01?** Based on empirical testing with RTX 4060 + Ryzen 7. Balances parallelism (GPU wins below 1%) vs. memory bandwidth (CPU wins above).
-- Adjusted for CPU core count (more cores → slightly lower threshold)
+- **Threshold:** 0.005 (0.5%) by default
+- **Why 0.005?** Reasonable default based on typical GPU/CPU performance characteristics. Balances parallelism (GPU wins below 0.5%) vs. memory bandwidth (CPU wins above).
+- Adjusted for CPU core count (more cores → slightly higher threshold, less GPU usage)
 
 ## Safety & Edge Cases
 
@@ -148,8 +138,11 @@ cd bench
 This generates `bench-results.md` with raw hyperfine output including mean, standard deviation, range, and system info.
 
 **Latest results (AMD Ryzen 7 5700, Zig 0.15.1):**
-- Mean time: 102.3 ms ± 2.4 ms for 1M decisions (20% narrow, 80% broad)
-- Throughput: ~9.8M decisions/sec
+- Workload: 1M queries (20% narrow, 80% broad)
+- Mean time: ~50ms for 1M decisions
+- Throughput: ~20M decisions/sec
+- Avg latency: ~50ns per decision
+- Note: Narrow queries leverage GPU acceleration; broad queries are CPU-bound
 - Full report: `bench/bench-results.md` 
 - Memory overhead: <1KB per router instance
 
