@@ -140,10 +140,10 @@ cd bench
 This generates `bench-results.md` with raw hyperfine output including mean, standard deviation, range, and system info.
 
 **Latest results (AMD Ryzen 7 5700, Zig 0.15.1, ReleaseFast):**
-- Workload: 1M queries with variable volumes
-- Mean time: ~0.2 ms for 1M decisions
-- Throughput: ~5B decisions/sec
-- Avg latency: ~0.2 ns per decision
+- Workload: 100M queries with variable volumes
+- Mean time: ~153 ms for 100M decisions
+- Throughput: ~653 M decisions/sec
+- Avg latency: ~1.53 ns per decision
 - Full report: `bench/bench-results.md`
 
 Full benchmark report: [bench-results.md](bench/bench-results.md)

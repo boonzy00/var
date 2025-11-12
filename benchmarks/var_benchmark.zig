@@ -10,7 +10,7 @@ pub fn main() !void {
         .gpu_available = true,
     });
 
-    const iterations = 1_000_000;
+    const iterations = 100_000_000;
     var i: usize = 0;
     var decision: var_mod.Decision = undefined;
 

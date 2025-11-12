@@ -1,3 +1,3 @@
 | Command | Mean [ms] | Min [ms] | Max [ms] | Relative |
 |:---|---:|---:|---:|---:|
-| `./zig-out/bin/var_benchmark` | 0.2 ± 0.1 | 0.1 | 0.3 | 1.00 |
+| `./zig-out/bin/var_benchmark` | 153.1 ± 0.5 | 152.4 | 153.6 | 1.00 |
