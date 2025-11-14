@@ -44,4 +44,20 @@ pub fn build(b: *std.Build) void {
     const run_benchmark = b.addRunArtifact(benchmark);
     const benchmark_step = b.step("benchmark", "Run VAR performance benchmark");
     benchmark_step.dependOn(&run_benchmark.step);
+
+    // === VAR-DETECT TOOL ===
+    const detect_mod = b.createModule(.{
+        .root_source_file = b.path("tools/var_detect.zig"),
+        .target = target,
+        .optimize = optimize,
+    });
+
+    const detect = b.addExecutable(.{
+        .name = "var-detect",
+        .root_module = detect_mod,
+    });
+    b.installArtifact(detect);
+
+    const detect_step = b.step("detect", "Build VAR detection tool");
+    detect_step.dependOn(&detect.step);
 }
