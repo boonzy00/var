@@ -1,6 +1,7 @@
 # VAR — Volume-Adaptive Routing
 
 [![VAR v0.2.0](https://img.shields.io/badge/VAR-v0.2.0-brightgreen.svg)](https://github.com/boonzy00/var)
+[![CI](https://github.com/boonzy00/var/actions/workflows/ci.yml/badge.svg)](https://github.com/boonzy00/var/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Zig 0.15.1](https://img.shields.io/badge/Zig-0.15.1-blue.svg)](https://ziglang.org/)
 
