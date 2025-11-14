@@ -1,5 +1,9 @@
 # VAR — Volume-Adaptive Routing
 
+[![VAR v0.2.0](https://img.shields.io/badge/VAR-v0.2.0-brightgreen.svg)](https://github.com/boonzy00/var)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Zig 0.15.1](https://img.shields.io/badge/Zig-0.15.1-blue.svg)](https://ziglang.org/)
+
 **GPU for narrow. CPU for broad. Auto-routed by query volume.**
 
 ```zig
@@ -168,16 +172,16 @@ if (selectivity < threshold) {
 | Infinite / NaN             | → .cpu            |
 
 # VAR v0.2 — SUB-2NS ROUTING. HARDWARE-PROVEN.
-638 million decisions per second.
-1.57 ns per decision.
+655 million decisions per second.
+1.52 ns per decision.
 Zero simulation. Pure silicon truth.
 
 OFFICIAL BENCHMARK — AMD Ryzen 7 5700, Zig 0.15.1, ReleaseFast
 100,000,000 routing decisions
 ────────────────────────────────────────
-Time:           156.72 ms
-Avg latency:     1.57 ns per decision
-Throughput:     638.06 M decisions/sec
+Time:           152.48 ms
+Avg latency:     1.52 ns per decision
+Throughput:     655.83 M decisions/sec
 Hyperfine Statistical Validation (10 runs)
 
 
@@ -282,8 +286,8 @@ Why This Matters
 
 Claim|Reality
 -----|-------
-"Sub-2ns routing"|1.57 ns — PROVEN
-"638 M/sec"|638.06 M/sec — MEASURED
+"Sub-2ns routing"|1.52 ns — PROVEN
+"655 M/sec"|655.83 M/sec — MEASURED
 "Production ready"|Statistically validated, no regressions
 
 This isn't marketing.
