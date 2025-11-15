@@ -90,17 +90,60 @@ Run the live 1M-decision demo to see VAR in action:
 zig build run -Doptimize=ReleaseFast
 ```
 
-**Sample Output:**
+**Sample Output (on Ryzen 7 5700):**
 ```
  VAR v1.0 Demo — 1M Routing Decisions
  ===================================
- Time:     0.76 ms
- Throughput: 1315789473 decisions/sec
- Per decision: 0.760 ns
+ Time:     0.08 ms
+ Throughput: 12771392082 decisions/sec
+ Per decision: 0.078 ns
  GPU routes: 500000 | CPU routes: 500000
 ```
 
 This demonstrates balanced routing with 50% GPU/50% CPU decisions on a 1M query workload.
+
+Tested on Ryzen 7 5700 ($170 CPU), Zig 0.15.1. Results vary by hardware—share yours!
+
+### Interactive Benchmark
+
+Test custom dataset sizes (100K to 1M decisions) on your hardware:
+
+```bash
+zig build -Doptimize=ReleaseFast
+./zig-out/bin/var_demo 500000  # Test 500K decisions
+```
+
+Or modify `bench/main.zig` and rebuild for different defaults.
+
+#### Pre-Filtering Test
+
+Use `--prefilter` with a dataset size to see AI data prep impact. Generates random data, filters (e.g., values > 0.5), and routes only filtered items. Shows filtering time vs. routing time.
+
+```bash
+zig build -Doptimize=ReleaseFast
+./zig-out/bin/var_demo 10000 --prefilter  # Test 10K with pre-filtering
+```
+
+Example output:
+```
+Pre-filtering: 4982 / 10000 items passed (>0.5)
+Filtering time: 5 μs
+```
+
+#### Game Pathfinding Test
+
+Use `--pathfinding` to simulate 1M NPC movement decisions on a game grid. Routes paths GPU/CPU based on complexity. Shows 80 μs vs. 1-second lag in old games.
+
+```bash
+zig build -Doptimize=ReleaseFast
+./zig-out/bin/var_demo 1000000 --pathfinding  # Test 1M pathfinding decisions
+```
+
+Example output:
+```
+Fast paths: 500000 | Slow paths: 500000
+(Baseline: 1 second lag in old games)
+```
 
 ## Performance
 
