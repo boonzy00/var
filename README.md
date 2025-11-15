@@ -82,6 +82,26 @@ const result = var.varRoute(100.0, 10000.0,
 // result = 42 (.gpu decision)
 ```
 
+## Demo
+
+Run the live 1M-decision demo to see VAR in action:
+
+```bash
+zig build run -Doptimize=ReleaseFast
+```
+
+**Sample Output:**
+```
+ VAR v1.0 Demo — 1M Routing Decisions
+ ===================================
+ Time:     0.76 ms
+ Throughput: 1315789473 decisions/sec
+ Per decision: 0.760 ns
+ GPU routes: 500000 | CPU routes: 500000
+```
+
+This demonstrates balanced routing with 50% GPU/50% CPU decisions on a 1M query workload.
+
 ## Performance
 
 | Implementation | Throughput     | Latency    | Speedup | Notes |

@@ -45,6 +45,24 @@ pub fn build(b: *std.Build) void {
     const benchmark_step = b.step("benchmark", "Run VAR performance benchmark");
     benchmark_step.dependOn(&run_benchmark.step);
 
+    // === DEMO ===
+    const demo_mod = b.createModule(.{
+        .root_source_file = b.path("bench/main.zig"),
+        .target = target,
+        .optimize = optimize,
+    });
+    demo_mod.addImport("var", var_mod);
+
+    const demo = b.addExecutable(.{
+        .name = "var_demo",
+        .root_module = demo_mod,
+    });
+    b.installArtifact(demo);
+
+    const run_demo = b.addRunArtifact(demo);
+    const demo_step = b.step("run", "Run VAR demo");
+    demo_step.dependOn(&run_demo.step);
+
     // === VAR-DETECT TOOL ===
     const detect_mod = b.createModule(.{
         .root_source_file = b.path("tools/var_detect.zig"),
