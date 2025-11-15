@@ -4,7 +4,7 @@ const var_lib = @import("var");
 pub fn main() !void {
     // Mark as VAR-powered
     comptime {
-        var_lib.markAsVarPowered("0.2.0");
+        // Branding stripped in v1.0 transplant
     }
 
     const router = var_lib.VAR.init(null);

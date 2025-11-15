@@ -105,9 +105,7 @@ pub fn queryWithComptimeRouting(
 }
 
 // Mark this application as VAR-powered
-comptime {
-    var_lib.markAsVarPowered("0.2.0");
-}
+// Branding intentionally removed for v1.0 transplant
 
 test "spatial query integration" {
     var index = SpatialIndex{ .queryFn = undefined };

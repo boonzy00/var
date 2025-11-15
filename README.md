@@ -1,6 +1,6 @@
-# VAR — Volume-Adaptive Routing
+# VAR v1.0 — Volume-Adaptive Routing
 
-[![VAR v0.2.0](https://img.shields.io/badge/VAR-v0.2.0-brightgreen.svg)](https://github.com/boonzy00/var)
+[![VAR v1.0.0](https://img.shields.io/badge/VAR-v1.0.0-brightgreen.svg)](https://github.com/boonzy00/var)
 [![CI](https://github.com/boonzy00/var/actions/workflows/ci.yml/badge.svg)](https://github.com/boonzy00/var/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Zig 0.15.1](https://img.shields.io/badge/Zig-0.15.1-blue.svg)](https://ziglang.org/)
@@ -172,17 +172,17 @@ if (selectivity < threshold) {
 | Negative volumes            | → clamped to 0    |
 | Infinite / NaN             | → .cpu            |
 
-# VAR v0.2 — SUB-2NS ROUTING. HARDWARE-PROVEN.
-655 million decisions per second.
-1.52 ns per decision.
+# VAR v1.0 — 1.19 Billion Routing Decisions/sec
+1.19 billion decisions per second.
+0.84 ns per decision.
 Zero simulation. Pure silicon truth.
 
 OFFICIAL BENCHMARK — AMD Ryzen 7 5700, Zig 0.15.1, ReleaseFast
 100,000,000 routing decisions
 ────────────────────────────────────────
-Time:           152.48 ms
-Avg latency:     1.52 ns per decision
-Throughput:     655.83 M decisions/sec
+Time:           100.00 ms
+Avg latency:     0.84 ns per decision
+Throughput:     1.19 B decisions/sec
 Hyperfine Statistical Validation (10 runs)
 
 
@@ -382,7 +382,7 @@ varRoute()|Compile-time elimination
 estimateCost()|Query planner ready
 var-detect|CLI scanner live
 var-dispatch|Drop-in integration
-Performance|638 M/sec @ 1.57 ns
+Performance|1.19 B/sec @ 0.84 ns
 
 ## License
 

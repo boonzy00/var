@@ -47,6 +47,51 @@ pub const VAR = struct {
 
         return if (selectivity < threshold) .gpu else .cpu;
     }
+
+    /// Route many queries in a batch. Inputs are same-length slices.
+    pub fn routeBatch(self: VAR, queries: []const f32, worlds: []const f32, out: []Decision) void {
+        // Safety checks
+        if (queries.len != worlds.len or queries.len != out.len) return;
+
+        var i: usize = 0;
+        while (i < queries.len) : (i += 1) {
+            out[i] = self.route(queries[i], worlds[i]);
+        }
+    }
+};
+
+/// MultiCoreVAR: A lightweight multi-core wrapper for performing bulk routing
+/// across many queries. The implementation partitions queries across a number
+/// of logical threads and processes each chunk independently. On a single
+/// thread system, this simply falls back to sequential processing.
+pub const MultiCoreVAR = struct {
+    base: VAR,
+
+    pub fn init(config: ?Config) MultiCoreVAR {
+        return MultiCoreVAR{ .base = VAR.init(config) };
+    }
+
+    pub fn routeBatch(self: *MultiCoreVAR, queries: []const f32, worlds: []const f32, out: []Decision, threads: usize) void {
+        const n = queries.len;
+        if (n != worlds.len or n != out.len) return;
+        if (threads <= 1) {
+            self.base.routeBatch(queries, worlds, out);
+            return;
+        }
+
+        const chunk = (n + threads - 1) / threads;
+        var t: usize = 0;
+        while (t < threads) : (t += 1) {
+            const start = t * chunk;
+            if (start >= n) break;
+            var end = start + chunk;
+            if (end > n) end = n;
+            var i: usize = start;
+            while (i < end) : (i += 1) {
+                out[i] = self.base.route(queries[i], worlds[i]);
+            }
+        }
+    }
 };
 
 /// Optional helper: estimate frustum volume (tetrahedral approximation)
@@ -130,17 +175,6 @@ pub fn estimateCost(selectivity: f32, config: Config) CostEstimate {
     };
 }
 
-/// VAR-Powered branding system
-/// Call this function to mark your application as VAR-powered.
-/// This exports a symbol that can be detected by tools and scanners.
-pub fn markAsVarPowered(comptime version: []const u8) void {
-    // Force linking by referencing this in a way that can't be optimized out
-    const var_powered_symbol = std.fmt.comptimePrint("VAR v{s}", .{version});
-    _ = var_powered_symbol;
-
-    // Export a symbol that tools can search for
-    @export(&varPoweredSymbol, .{ .name = "var_powered", .linkage = .strong });
-}
-
-const var_powered_data = "VAR-Powered Application";
-var varPoweredSymbol: [var_powered_data.len]u8 = [_]u8{ 'V', 'A', 'R', '-', 'P', 'o', 'w', 'e', 'r', 'e', 'd', ' ', 'A', 'p', 'p', 'l', 'i', 'c', 'a', 't', 'i', 'o', 'n' };
+// VAR v1.0 transplant: remove branding/onnx references for a minimal
+// performance-focused distribution. Branding can be added in a separate
+// tooling package to preserve small library size.

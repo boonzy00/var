@@ -11,7 +11,7 @@ pub fn build(b: *std.Build) void {
         .optimize = optimize,
     });
 
-    // Library
+    // Static library (performance-focused)
     const lib = b.addLibrary(.{
         .name = "var",
         .root_module = var_mod,
@@ -44,6 +44,24 @@ pub fn build(b: *std.Build) void {
     const run_benchmark = b.addRunArtifact(benchmark);
     const benchmark_step = b.step("benchmark", "Run VAR performance benchmark");
     benchmark_step.dependOn(&run_benchmark.step);
+
+    // Multicore benchmark (logical partitioning)
+    const mc_bench_mod = b.createModule(.{
+        .root_source_file = b.path("benchmarks/var_multicore_benchmark.zig"),
+        .target = target,
+        .optimize = optimize,
+    });
+    mc_bench_mod.addImport("var", var_mod);
+
+    const mc_benchmark = b.addExecutable(.{
+        .name = "var_multicore_benchmark",
+        .root_module = mc_bench_mod,
+    });
+    b.installArtifact(mc_benchmark);
+
+    const run_mc_benchmark = b.addRunArtifact(mc_benchmark);
+    const mc_benchmark_step = b.step("benchmark-mc", "Run VAR multicore benchmark");
+    mc_benchmark_step.dependOn(&run_mc_benchmark.step);
 
     // === VAR-DETECT TOOL ===
     const detect_mod = b.createModule(.{

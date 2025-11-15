@@ -15,6 +15,28 @@ test "VAR routes correctly" {
     try std.testing.expect(no_gpu.route(1.0, 1000.0) == .cpu);
 }
 
+test "routeBatch works" {
+    const router = v.VAR.init(null);
+    var queries: [4]f32 = .{ 1.0, 100.0, 2.0, 500.0 };
+    var worlds: [4]f32 = .{ 1000.0, 1000.0, 1000.0, 1000.0 };
+    var out: [4]v.Decision = undefined;
+    router.routeBatch(queries[0..], worlds[0..], out[0..]);
+    try std.testing.expect(out[0] == .gpu);
+    try std.testing.expect(out[1] == .cpu);
+}
+
+test "MultiCoreVAR routeBatch partitions" {
+    var m = v.MultiCoreVAR.init(null);
+    var queries: [8]f32 = .{ 1.0, 100.0, 2.0, 500.0, 1.0, 100.0, 2.0, 500.0 };
+    var worlds: [8]f32 = .{ 1000.0, 1000.0, 1000.0, 1000.0, 1000.0, 1000.0, 1000.0, 1000.0 };
+    var out: [8]v.Decision = undefined;
+    // logical partitioning with 4 'threads'
+    m.routeBatch(queries[0..], worlds[0..], out[0..], 4);
+    try std.testing.expect(out[0] == .gpu);
+    try std.testing.expect(out[1] == .cpu);
+    try std.testing.expect(out[4] == .gpu);
+}
+
 test "frustumVolume calculation" {
     // Test with known values: near=1, far=2, fov_y=π/2 (90°), aspect=1
     const vol = v.frustumVolume(1.0, 2.0, std.math.pi / 2.0, 1.0);
@@ -102,9 +124,4 @@ test "estimateCost calculation" {
     try std.testing.expect(single_core_cost.cpu > multi_core_cost.cpu); // More cores = lower CPU cost
 }
 
-test "VAR-Powered branding" {
-    // Test that the branding function can be called
-    v.markAsVarPowered("0.2.0");
-    // The symbol should be exported and detectable
-    // This is mainly a compile-time test
-}
+// Branding is omitted in this performance-focused transplant.
