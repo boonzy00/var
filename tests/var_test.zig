@@ -102,6 +102,109 @@ test "estimateCost calculation" {
     try std.testing.expect(single_core_cost.cpu > multi_core_cost.cpu); // More cores = lower CPU cost
 }
 
+test "MultiCoreVAR initialization and basic routing" {
+    const allocator = std.testing.allocator;
+
+    const config = v.Config{
+        .multi_core = true,
+        .cpu_cores = 4,
+        .thread_pool_size = 4,
+    };
+    // config is passed by value, linter doesn't detect this
+    _ = &config;
+
+    var multi_var = try v.MultiCoreVAR.init(allocator, config);
+    defer multi_var.deinit();
+
+    // Test single routing
+    const decision1 = multi_var.routeSingle(1.0, 1000.0);
+    try std.testing.expect(decision1 == .gpu);
+
+    const decision2 = multi_var.routeSingle(100.0, 1000.0);
+    try std.testing.expect(decision2 == .cpu);
+}
+
+test "MultiCoreVAR batch routing" {
+    const allocator = std.testing.allocator;
+
+    const config = v.Config{
+        .multi_core = true,
+        .cpu_cores = 4,
+        .thread_pool_size = 4,
+    };
+    // config is passed by value, linter doesn't detect this
+    _ = &config;
+
+    var multi_var = try v.MultiCoreVAR.init(allocator, config);
+    defer multi_var.deinit();
+
+    // Test batch routing
+    const query_vols = [_]f32{ 1.0, 100.0, 10.0 };
+    const world_vols = [_]f32{ 1000.0, 1000.0, 1000.0 };
+    var decisions = [_]v.Decision{ undefined, undefined, undefined };
+
+    try multi_var.routeBatch(&query_vols, &world_vols, &decisions);
+
+    try std.testing.expect(decisions[0] == .gpu); // 1/1000 = 0.001 < threshold
+    try std.testing.expect(decisions[1] == .cpu); // 100/1000 = 0.1 > threshold
+    try std.testing.expect(decisions[2] == .gpu); // 10/1000 = 0.01 ≈ threshold, but should be GPU with multi-core adjustment
+}
+
+test "varRouteMultiCore batch processing" {
+    const allocator = std.testing.allocator;
+
+    const config = v.Config{
+        .multi_core = true,
+        .cpu_cores = 4,
+        .thread_pool_size = 4,
+    };
+
+    const query_vols = [_]f32{ 1.0, 100.0 };
+    const world_vols = [_]f32{ 1000.0, 1000.0 };
+
+    const results = try v.varRouteMultiCore(allocator, config, &query_vols, &world_vols, struct {
+        fn gpu() u32 {
+            return 42;
+        }
+    }.gpu, struct {
+        fn cpu() u32 {
+            return 24;
+        }
+    }.cpu);
+    defer allocator.free(results);
+
+    try std.testing.expectEqual(@as(usize, 2), results.len);
+    try std.testing.expect(results[0] == 42); // GPU path
+    try std.testing.expect(results[1] == 24); // CPU path
+}
+
+test "varRouteMultiCore fallback to sequential" {
+    const allocator = std.testing.allocator;
+
+    const config = v.Config{
+        .multi_core = false, // Force sequential processing
+        .cpu_cores = 4,
+    };
+
+    const query_vols = [_]f32{ 1.0, 100.0 };
+    const world_vols = [_]f32{ 1000.0, 1000.0 };
+
+    const results = try v.varRouteMultiCore(allocator, config, &query_vols, &world_vols, struct {
+        fn gpu() u32 {
+            return 42;
+        }
+    }.gpu, struct {
+        fn cpu() u32 {
+            return 24;
+        }
+    }.cpu);
+    defer allocator.free(results);
+
+    try std.testing.expectEqual(@as(usize, 2), results.len);
+    try std.testing.expect(results[0] == 42); // GPU path
+    try std.testing.expect(results[1] == 24); // CPU path
+}
+
 test "VAR-Powered branding" {
     // Test that the branding function can be called
     v.markAsVarPowered("0.2.0");

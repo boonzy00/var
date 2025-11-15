@@ -2,15 +2,58 @@ name: CI
 
 on:
   push:
+    branches: [ main ]
   pull_request:
+    branches: [ main ]
 
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: goto-bus-stop/setup-zig@v2
+
+      - name: Setup Zig
+        uses: goto-bus-stop/setup-zig@v2
         with:
           version: 0.15.1
-      - run: zig build
-      - run: zig build test
+
+      - name: Build
+        run: zig build
+
+      - name: Run Tests
+        run: zig build test
+
+      - name: Run Benchmarks
+        run: zig build benchmark -Doptimize=ReleaseFast
+
+  test-macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Zig
+        uses: goto-bus-stop/setup-zig@v2
+        with:
+          version: 0.15.1
+
+      - name: Build
+        run: zig build
+
+      - name: Run Tests
+        run: zig build test
+
+  test-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Zig
+        uses: goto-bus-stop/setup-zig@v2
+        with:
+          version: 0.15.1
+
+      - name: Build
+        run: zig build
+
+      - name: Run Tests
+        run: zig build test

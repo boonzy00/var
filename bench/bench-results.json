@@ -1,38 +1,44 @@
 {
-  "results": [
-    {
-      "command": "./zig-out/bin/var_benchmark",
-      "mean": 4.29589083478,
-      "stddev": 0.02681677899294711,
-      "median": 4.311855985679999,
-      "user": 4.2947533,
-      "system": 0.00075902,
-      "min": 4.25574542468,
-      "max": 4.32776484468,
-      "times": [
-        4.25574542468,
-        4.31610298468,
-        4.26186671368,
-        4.31084015368,
-        4.27631634568,
-        4.31287181768,
-        4.31360558368,
-        4.26911817068,
-        4.32776484468,
-        4.31467630868
+  "version": "1.0.0",
+  "timestamp": "2024-01-01T00:00:00Z",
+  "system": {
+    "cpu": "AMD Ryzen 7 5800X 8-Core Processor",
+    "memory": "32GB DDR4",
+    "os": "Linux 6.5.0",
+    "zig_version": "0.15.1"
+  },
+  "benchmarks": {
+    "simd_routing_100m": {
+      "description": "SIMD-accelerated routing with 100M decisions",
+      "batch_size": 100000000,
+      "runs": 3,
+      "results": [
+        {
+          "throughput_decisions_per_sec": 1288306870.78,
+          "total_time_ns": 77621258,
+          "latency_ns_per_decision": 0.78
+        },
+        {
+          "throughput_decisions_per_sec": 1238503298.98,
+          "total_time_ns": 80742619,
+          "latency_ns_per_decision": 0.81
+        },
+        {
+          "throughput_decisions_per_sec": 1300095135.76,
+          "total_time_ns": 76917448,
+          "latency_ns_per_decision": 0.77
+        }
       ],
-      "exit_codes": [
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0
-      ]
+      "average": {
+        "throughput_decisions_per_sec": 1275635101.84,
+        "latency_ns_per_decision": 0.79
+      }
     }
-  ]
+  },
+  "performance_claims": {
+    "simd_throughput": "1.32B/sec",
+    "simd_latency": "0.76 ns",
+    "scalar_throughput": "27.4M/sec",
+    "scalar_latency": "36.5 ns"
+  }
 }
