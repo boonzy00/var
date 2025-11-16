@@ -3,6 +3,7 @@ const std = @import("std");
 pub fn build(b: *std.Build) void {
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
+    const simd_enabled = b.option(bool, "simd", "Enable SIMD in benchmark") orelse true;
 
     // Shared module for library and tests
     const var_mod = b.createModule(.{
@@ -29,11 +30,12 @@ pub fn build(b: *std.Build) void {
 
     // === BENCHMARK ===
     const benchmark_mod = b.createModule(.{
-        .root_source_file = b.path("benchmarks/var_benchmark.zig"),
+        .root_source_file = b.path("bench/main.zig"),
         .target = target,
         .optimize = optimize,
     });
     benchmark_mod.addImport("var", var_mod);
+    benchmark_mod.addCMacro("SIMD_ENABLED", if (simd_enabled) "1" else "0");
 
     const benchmark = b.addExecutable(.{
         .name = "var_benchmark",
