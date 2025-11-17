@@ -49,6 +49,7 @@ pub const Config = struct {
     cpu_cores: u32 = 8,
     gpu_available: bool = true,
     auto_tune: bool = false,
+    force_path: ?Path = null,
 };
 
 pub const VAR = struct {

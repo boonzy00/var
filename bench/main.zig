@@ -3,8 +3,6 @@ const std = @import("std");
 const var_lib = @import("var");
 const timer = std.time.Timer;
 
-const SIMD_ENABLED = true; // Set to false for scalar bench
-
 pub fn main() !void {
     var arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
     defer arena.deinit();
@@ -32,7 +30,7 @@ pub fn main() !void {
     @memset(world_vols, world_vol);
 
     const config = var_lib.Config{
-        .force_path = if (SIMD_ENABLED) .avx2 else .scalar,
+        .force_path = .avx2, // Change this for testing: .scalar, .avx2, .neon
         .gpu_available = true,
         .gpu_threshold = 0.01,
     };
