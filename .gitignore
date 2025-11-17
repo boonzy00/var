@@ -18,3 +18,10 @@ gyro.lock
 .vscode/
 .idea/
 *.swp
+
+# Release artifacts
+*.tar.gz
+*sum.txt
+
+# Benchmark results
+bench/*-results.*

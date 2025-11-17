@@ -32,7 +32,7 @@ pub fn main() !void {
     @memset(world_vols, world_vol);
 
     const config = var_lib.Config{
-        .simd_enabled = SIMD_ENABLED,
+        .force_path = if (SIMD_ENABLED) .avx2 else .scalar,
         .gpu_available = true,
         .gpu_threshold = 0.01,
     };
